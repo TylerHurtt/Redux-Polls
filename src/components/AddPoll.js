@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { handleAddPoll } from '../actions/polls';
 
 class AddPoll extends Component {
   state = {
+    id: '',
     question: '',
+    author: '',
+    timestamp: '',
     a: '',
     b: '',
     c: '',
@@ -13,7 +17,8 @@ class AddPoll extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     // redirect to /
-    console.log('new state ===>', this.state);
+    console.log('New Poll  ==>', this.state);
+    this.props.dispatch(handleAddPoll(this.state));
   };
 
   handleInputChange = (e) => {
@@ -92,10 +97,6 @@ class AddPoll extends Component {
       </div>
     );
   }
-}
-
-function mapStateToProps() {
-  return {};
 }
 
 export default connect()(AddPoll);
