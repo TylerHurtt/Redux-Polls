@@ -1,68 +1,77 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { getPercentage } from '../utils/helpers';
+
+const getVotesKeys = () => ['aVotes', 'bVotes', 'cVotes', 'dVotes'];
 
 class Poll extends Component {
+  handleAnswer = (answer) => {
+    const { poll, authed } = this.props;
+
+    this.answered = true;
+
+    console.log(`${authed} voted for ${answer}`);
+  };
+
   render() {
     const { poll, vote, authorAvatarURL } = this.props;
-    const {
-      question,
-      aText,
-      aVotes,
-      bText,
-      bVotes,
-      cText,
-      cVotes,
-      dText,
-      dVotes,
-    } = poll;
-
-    const display = () => {
-      display: !vote && 'none';
-    };
+    const { question } = poll;
+    const total = getVotesKeys().reduce((count, current) => {
+      return count + poll[current].length;
+    }, 0);
     return (
       <div className='poll-container'>
-        <h1>{question}</h1>
-        <div>
-          <h3>by: </h3>
-          <img className='avatar' src={authorAvatarURL} alt='' />
+        <h1 className='question'>{question}</h1>
+        <div className='poll-author'>
+          BY{' '}
+          <img
+            className='avatar'
+            src={authorAvatarURL}
+            alt={`Avatar of the poll author`}
+          />
         </div>
-        <div className='option'>
-          <span>{aText}</span>
-          <span style={{ display: !vote && 'none' }}>{aVotes.length}</span>
-        </div>
-        <div className='option'>
-          <span>{bText}</span>
-          <span style={{ display: !vote && 'none' }}>{bVotes.length}</span>
-        </div>
-        <div className='option'>
-          <span>{cText}</span>
-          <span style={{ display: !vote && 'none' }}>{cVotes.length}</span>
-        </div>
-        <div className='option'>
-          <span>{dText}</span>
-          <span style={{ display: !vote && 'none' }}>{dVotes.length}</span>
-        </div>
+        <ul>
+          {['aText', 'bText', 'cText', 'dText'].map((key) => {
+            const count = poll[`${key[0]}Votes`].length;
+            const percent = getPercentage(count, total);
+            return (
+              <li
+                onClick={() => {
+                  !vote && !this.answered && this.handleAnswer(key[0]);
+                }}
+                key={key[0]}
+                className={`option ${key[0] === vote && 'chosen'}`}
+              >
+                <div className='result'>
+                  <span>{poll[key]}</span>
+                  {!vote ? null : (
+                    <span>
+                      {percent}% ({count})
+                    </span>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     );
   }
 }
 
 function mapStateToProps({ authed, polls, users }, { match }) {
-  console.log(match);
   const { id } = match.params;
   const poll = polls[id];
-  console.log(poll);
 
-  const vote = ['aVotes', 'bVotes', 'cVotes', 'dVotes'].reduce(
-    (vote, current) => {
-      if (vote) return vote[0];
-      console.log(poll[current]);
-      return poll[current].includes[authed] ? current : vote;
-    },
-    null
-  );
+  if (!poll) return { poll: null };
+
+  const vote = getVotesKeys().reduce((vote, current) => {
+    if (vote) return vote;
+    return poll[current].includes(authed) ? current[0] : vote;
+  }, null);
 
   return {
+    authed,
     poll,
     vote,
     authorAvatarURL: users[poll.author].avatarURL,
