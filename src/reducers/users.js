@@ -7,7 +7,7 @@ export default function users(state = {}, action) {
     case RECEIVE_USERS:
       return { ...state, ...action.users };
     case ADD_POLL:
-      const { author, id } = this.props;
+      const { author, id } = action.poll;
       return {
         ...state,
         [author]: {
@@ -18,7 +18,6 @@ export default function users(state = {}, action) {
     case ADD_ANSWER:
       const { authed } = action;
       const pid = action.id;
-
       const user = state[authed];
 
       return {
