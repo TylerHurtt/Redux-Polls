@@ -20,7 +20,6 @@ function addPoll(poll) {
 export function handleAddPoll(poll) {
   return (dispatch, getState) => {
     const { authed } = getState();
-
     dispatch(showLoading());
     return savePoll({
       ...poll,
