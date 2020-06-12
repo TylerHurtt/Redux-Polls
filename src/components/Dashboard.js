@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 class Dashboard extends Component {
   state = {
@@ -22,7 +23,7 @@ class Dashboard extends Component {
     const { answered, unanswered } = this.props;
     const list = showAnswered ? answered : unanswered;
     return (
-      <div>
+      <div className='container'>
         <div className='dashboard-toggle'>
           <button
             style={{ textDecoration: !showAnswered ? 'underline' : 'none' }}
@@ -40,7 +41,9 @@ class Dashboard extends Component {
         </div>
         <ul className='dashboard-list'>
           {list.map(({ id, question }) => (
-            <li key={id}>{question}</li>
+            <li key={id}>
+              <Link to={`/polls/${id}`}>{question}</Link>
+            </li>
           ))}
         </ul>
       </div>
@@ -49,7 +52,6 @@ class Dashboard extends Component {
 }
 
 function mapStateToProps({ authed, polls, users }) {
-  console.log(authed);
   const user = users[authed];
   // const answers = users[authed].answers;
 
